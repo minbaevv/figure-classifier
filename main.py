@@ -23,7 +23,7 @@ app = FastAPI()
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 model = models.resnet18(pretrained=True).to(device)
-model.fc = torch.nn.Linear(256, len(classes))
+model.fc = torch.nn.Linear(512, len(classes))
 model.load_state_dict(torch.load("model.pth", map_location=device))
 model.to(device)
 model.eval()
@@ -40,7 +40,7 @@ async def predict(file: UploadFile = File(...)):
 
         with torch.no_grad():
             y_pred = model(img_tensor)
-            pred = torch.argmax(dim=1).item()
+            pred = torch.argmax(y_pred, dim=1).item()
 
         return {"result": classes[pred]}
 
